@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: collect-module-deployment
+spec:
+  replicas: 3  # Adjust the number of replicas as needed
+  selector:
+    matchLabels:
+      app: collect-module
+  template:
+    metadata:
+      labels:
+        app: collect-module
+    spec:
+      containers:
+      - name: collect-module
+        image: 132568907860.dkr.ecr.ap-south-1.amazonaws.com/event_collect_and_fan_out_repo/image1:1.0
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: "0.5"  # Adjust resource limits as needed
+            memory: "512Mi"
+          requests:
+            cpu: "0.2"  # Adjust resource requests as needed
+            memory: "256Mi"
+        readinessProbe:
+          httpGet:
+            path: /healthz  # Adjust the health check path based on your application
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /healthz  # Adjust the health check path based on your application
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 20
